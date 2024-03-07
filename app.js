@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const category = require("./routes/category");
 const auth =require('./routes/auth')
+const post = require('./routes/posts');
+
 
 dotenv.config()
 const MONGODB_URI = process.env.MONGODB_URI
@@ -40,6 +42,11 @@ app.get('/auth', (req, res)=>{
 })
 
 
+app.use(express.json());
+
+app.use('post',post);
+
+
 
 mongoose.connect(MONGODB_URI).then(()=>{
     console.log('Connected to the database')
@@ -49,5 +56,4 @@ mongoose.connect(MONGODB_URI).then(()=>{
 }).catch(err=>{
     console.log('Error connecting to database:',err.message)
 })
-
 

@@ -11,7 +11,8 @@ router.get('/login',(req,res)=>{
 
 router.post('/register', async (req, res)=>{
     try{
-        const user = new User({username, password})= req.body;
+        const {username,password}=req.body;
+        const user = new User({username,password});
             await user.save();
             res.status(201).send('User register successed');
             
@@ -23,4 +24,23 @@ router.post('/register', async (req, res)=>{
 
 router.get('/register',(req,res)=>{
     res.sendFile(__dirname+'/auth.html')})
+
+router.post('/login', async (req, res)=>{
+    try{
+        const {username,password}=req.body;
+        const user = new User.findOne({username: username});
+        if(!user){
+            return res.status(404).send('user not found')
+        }
+        const isPasswordMatch = await bcrypt.compare(password,user.password);
+        if(!isPasswordMatch){
+            return res.status(401).send('invalid password')
+        }
+        const token = jwt.sign({_id:user._id}, process.env.JWT_SECRET);
+        res.send({token: token})
+    }catch(error){
+        res.status(400).send(err.message)
+    }
+});
+
 module.exports=router;
